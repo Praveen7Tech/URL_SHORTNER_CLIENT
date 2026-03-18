@@ -1,1 +1,60 @@
 @import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@theme {
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --color-background: hsl(220 20% 6%);
+  --color-foreground: hsl(210 20% 92%);
+  --color-card: hsl(220 18% 10%);
+  --color-card-foreground: hsl(210 20% 92%);
+  --color-primary: hsl(175 80% 50%);
+  --color-primary-foreground: hsl(220 20% 6%);
+  --color-secondary: hsl(220 16% 16%);
+  --color-secondary-foreground: hsl(210 20% 80%);
+  --color-muted: hsl(220 14% 14%);
+  --color-muted-foreground: hsl(215 12% 50%);
+  --color-destructive: hsl(0 72% 56%);
+  --color-border: hsl(220 14% 18%);
+
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(175 80% 50% / 0.2); }
+    50% { box-shadow: 0 0 40px hsl(175 80% 50% / 0.4); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+.glow-primary {
+  box-shadow: 0 0 30px hsl(175 80% 50% / 0.3);
+}
+
+.glass {
+  background: hsl(220 18% 10% / 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid hsl(220 14% 18% / 0.5);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, hsl(175 80% 50%), hsl(195 90% 60%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

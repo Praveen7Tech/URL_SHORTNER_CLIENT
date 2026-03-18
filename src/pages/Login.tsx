@@ -1,32 +1,38 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AuthApi } from "../api/auth.api";
 import toast from "react-hot-toast";
-import { registerSchema, type RegisterFormData } from "../validator/auth.schema";
+import { AuthApi } from "../api/auth.api";
+import { setCredentials } from "../app/slice/authSlice";
+import { useDispatch } from "react-redux";
+import { loginSchema, type LoginFormData } from "../validator/auth.schema";
 
-const Register = () => {
+const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      const res = await AuthApi.register(data) 
-      toast.success(res.message)
-      navigate("/login"); 
-    } catch (error) {
-      console.error("Error in register",error);
+      const res = await AuthApi.login(data);
+      if(res){
+         dispatch(setCredentials(res.user))
+      }
+      toast.success(res.message); 
+      navigate("/home");
+    } catch {
+      
     }
   };
 
@@ -35,11 +41,8 @@ const Register = () => {
       
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl animate-float" />
-        <div
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-primary/3 blur-3xl animate-float"
-          style={{ animationDelay: "3s" }}
-        />
+        <div className="absolute -top-40 -left-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl animate-float" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-primary/3 blur-3xl animate-float" style={{ animationDelay: "3s" }} />
       </div>
 
       <motion.div
@@ -49,32 +52,13 @@ const Register = () => {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold font-heading gradient-text">
-            SnapLink
-          </h1>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Create your account
-          </p>
+          <h1 className="text-3xl font-bold gradient-text">SnapLink</h1>
+          <p className="text-muted-foreground mt-2 text-sm">Welcome back</p>
         </div>
 
         {/* Form */}
         <div className="glass rounded-xl p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Name</label>
-              <input
-                {...register("name")}
-                placeholder="John Doe"
-                className="w-full px-4 py-3 rounded-lg bg-secondary border border-border focus:ring-2 focus:ring-primary/50 text-sm"
-              />
-              {errors.name && (
-                <p className="text-destructive text-xs mt-1.5">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
 
             {/* Email */}
             <div>
@@ -96,6 +80,7 @@ const Register = () => {
               <label className="block text-sm font-medium mb-1.5">
                 Password
               </label>
+
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -103,6 +88,7 @@ const Register = () => {
                   placeholder="••••••••"
                   className="w-full px-4 py-3 rounded-lg bg-secondary border border-border pr-10 focus:ring-2 focus:ring-primary/50 text-sm"
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -123,18 +109,20 @@ const Register = () => {
             <motion.button
               whileTap={{ scale: 0.98 }}
               disabled={isSubmitting}
-              className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:opacity-90 disabled:opacity-50"
+              className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {isSubmitting ? "Creating..." : "Create Account"}
+              <LogIn size={16} />
+              {isSubmitting ? "Signing in..." : "Sign In"}
             </motion.button>
+
           </form>
         </div>
 
         {/* Footer */}
         <p className="text-center mt-6 text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <Link to="/login" className="text-primary hover:underline font-medium">
-            Sign in
+          Don't have an account?{" "}
+          <Link to="/register" className="text-primary hover:underline font-medium">
+            Sign up
           </Link>
         </p>
       </motion.div>
@@ -142,4 +130,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default LoginPage;
