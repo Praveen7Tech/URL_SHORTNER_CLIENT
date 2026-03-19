@@ -13,9 +13,11 @@ const HomePage = () => {
   const [shortUrl, setShortUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // ✅ Validate URL
   const isValidUrl = (str: string) => {
     try {
       new URL(str);
@@ -25,37 +27,53 @@ const HomePage = () => {
     }
   };
 
+  // ✅ Handle shorten
   const handleShorten = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setShortUrl("");
 
     if (!url.trim()) {
       setError("Please enter a URL");
       return;
     }
 
+    // const formattedUrl = normalizeUrl(url);
+
+    if (!isValidUrl(url)) {
+      setError("Please enter a valid URL with ('https://')");
+      return;
+    }
+
     try {
       const res = await UrlApi.createShortUrl({ url });
-
       setShortUrl(res.shortUrl);
       toast.success("URL shortened successfully");
     } catch {
-      // handled globally in interceptor
+      // handled globally
     }
   };
 
+  // ✅ Copy
   const handleCopy = async () => {
     await navigator.clipboard.writeText(shortUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleLogout = async() => {
-    const res = await AuthApi.logout()
-    dispatch(logout())
-    navigate('/')
-    toast.success(res.message)
+  // ✅ Reset
+  const handleReset = () => {
+    setUrl("");
+    setShortUrl("");
+    setCopied(false);
+    setError("");
+  };
+
+  // ✅ Logout
+  const handleLogout = async () => {
+    const res = await AuthApi.logout();
+    dispatch(logout());
+    navigate("/");
+    toast.success(res.message);
   };
 
   return (
@@ -71,7 +89,9 @@ const HomePage = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto"
       >
-        <h1 className="text-xl font-bold font-heading gradient-text">SnapLink</h1>
+        <h1 className="text-xl font-bold font-heading gradient-text">
+          SnapLink
+        </h1>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -99,9 +119,11 @@ const HomePage = () => {
           >
             <Scissors className="w-8 h-8 text-primary" />
           </motion.div>
+
           <h2 className="text-4xl md:text-5xl font-bold font-heading text-foreground">
             Shorten Your <span className="gradient-text">Links</span>
           </h2>
+
           <p className="text-muted-foreground mt-3 text-base max-w-md mx-auto">
             Paste your long URL and get a clean, shareable short link instantly.
           </p>
@@ -114,27 +136,49 @@ const HomePage = () => {
           transition={{ delay: 0.3 }}
           className="w-full max-w-xl"
         >
-          <form onSubmit={handleShorten} className="glass rounded-xl p-2 flex gap-2">
+          <form
+            onSubmit={handleShorten}
+            className="glass rounded-xl p-2 flex gap-2"
+          >
             <div className="flex-1 flex items-center gap-3 px-3">
               <Link2 className="w-5 h-5 text-muted-foreground shrink-0" />
               <input
                 type="text"
                 value={url}
-                onChange={(e) => { setUrl(e.target.value); setError(""); }}
+                disabled={!!shortUrl}
+                onChange={(e) => {
+                  setUrl(e.target.value);
+                  setError("");
+                }}
                 placeholder="Paste your long URL here..."
-                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none py-3 text-sm"
+                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none py-3 text-sm disabled:opacity-50"
               />
             </div>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-sm glow-primary hover:opacity-90 transition-all shrink-0"
-            >
-              Shorten
-            </motion.button>
+
+            {/* ✅ Conditional Button */}
+            {!shortUrl ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-sm glow-primary hover:opacity-90 transition-all shrink-0"
+              >
+                Shorten
+              </motion.button>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={handleReset}
+                className="px-6 py-3 bg-secondary text-foreground rounded-lg font-semibold text-sm border border-border hover:border-primary/50 transition-all shrink-0"
+              >
+                Create Another
+              </motion.button>
+            )}
           </form>
 
+          {/* Error */}
           {error && (
             <motion.p
               initial={{ opacity: 0, y: -5 }}
@@ -156,11 +200,17 @@ const HomePage = () => {
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               className="mt-8 w-full max-w-xl glass rounded-xl p-6"
             >
-              <p className="text-xs text-muted-foreground mb-2">Your shortened URL</p>
+              <p className="text-xs text-muted-foreground mb-2">
+                Your shortened URL
+              </p>
+
               <div className="flex items-center gap-3">
                 <div className="flex-1 px-4 py-3 bg-secondary rounded-lg">
-                  <p className="text-primary font-medium text-sm truncate">{shortUrl}</p>
+                  <p className="text-primary font-medium text-sm truncate">
+                    {shortUrl}
+                  </p>
                 </div>
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

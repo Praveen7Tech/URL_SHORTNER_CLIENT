@@ -1,5 +1,5 @@
-import type { LoginFormData } from "../pages/Login";
-import type { FormData } from "../pages/Register";
+
+import type { LoginFormData } from "../validator/auth.schema";
 import axiosInstance from "./axios";
 
 export interface User{
