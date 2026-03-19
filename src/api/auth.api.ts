@@ -1,5 +1,5 @@
 
-import type { LoginFormData } from "../validator/auth.schema";
+import type { LoginFormData, RegisterFormData } from "../validator/auth.schema";
 import axiosInstance from "./axios";
 
 export interface User{
@@ -14,7 +14,7 @@ export interface LoginResponse{
 
 export const AuthApi = {
 
-    register: async(formData: FormData): Promise<{message:string}>=>{
+    register: async(formData: RegisterFormData): Promise<{message:string}>=>{
         const response = await axiosInstance.post('/auth/register', formData);
         return response.data
     },
