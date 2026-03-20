@@ -12,10 +12,25 @@ export interface LoginResponse{
     message: string
 }
 
+export interface RegisterReponse{
+    message: string
+    otp: string
+}
+
 export const AuthApi = {
 
-    register: async(formData: RegisterFormData): Promise<{message:string}>=>{
+    register: async(formData: RegisterFormData): Promise<RegisterReponse>=>{
         const response = await axiosInstance.post('/auth/register', formData);
+        return response.data
+    },
+
+    otpVerification: async(email: string,otp: string): Promise<{message: string}>=>{
+        const response = await axiosInstance.post('/auth/verifyotp', {email,otp});
+        return response.data
+    },
+
+    resendOtp: async(email: string): Promise<{message: string}>=>{
+        const response = await axiosInstance.post('/auth/resendOtp', {email});
         return response.data
     },
 

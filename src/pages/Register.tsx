@@ -24,7 +24,7 @@ const Register = () => {
     try {
       const res = await AuthApi.register(data) 
       toast.success(res.message)
-      navigate("/login"); 
+      navigate("/verifyotp", { state: { email: data.email } }); 
     } catch (error) {
       console.error("Error in register",error);
     }

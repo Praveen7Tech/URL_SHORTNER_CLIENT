@@ -11,6 +11,9 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthApi } from "./api/auth.api";
 import { logout, setCredentials } from "./app/slice/authSlice";
+import OtpPage from "./pages/OtpVerification";
+import Loading from "./components/loading/Loading";
+import NotFound from "./components/notfound/NotFound";
 
 function App() {
   const dispatch = useDispatch();
@@ -28,21 +31,18 @@ function App() {
     initializeAuth();
   }, [dispatch]);
 
-  if (isLoading) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
-         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+  if (isLoading) return <Loading/>
 
   return (
     <BrowserRouter>
        <Routes>
           <Route path="/register" element={<PublicRoute><Register/></PublicRoute>}/>
+          <Route path="/verifyotp" element={<PublicRoute><OtpPage/></PublicRoute>}/>
           <Route path='/login' element={<PublicRoute><LoginPage/></PublicRoute>}/>
           <Route path="/home" element={<ProtectedRoute><HomePage/></ProtectedRoute>}/>
           <Route path="/" element={<LandingPage/>}/>
+
+          <Route path="*" element={<NotFound />} />
        </Routes>
        <Toaster />
     </BrowserRouter>
