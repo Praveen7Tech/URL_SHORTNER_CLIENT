@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import { logout } from "../app/slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../api/auth.api";
+import LinkHistory from "../components/urls/LinkHistory";
+import { useLinkHistory } from "../hooks/useLinkHistory";
 
 const HomePage = () => {
   const [url, setUrl] = useState("");
@@ -16,8 +18,9 @@ const HomePage = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { links, page, setPage, totalPages, refreshLinks } = useLinkHistory();
 
-  // ✅ Validate URL
+  // Validate URL
   const isValidUrl = (str: string) => {
     try {
       new URL(str);
@@ -27,7 +30,7 @@ const HomePage = () => {
     }
   };
 
-  // ✅ Handle shorten
+  // Handle shorten
   const handleShorten = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -48,19 +51,20 @@ const HomePage = () => {
       const res = await UrlApi.createShortUrl({ url });
       setShortUrl(res.shortUrl);
       toast.success("URL shortened successfully");
+      refreshLinks();
     } catch {
       // handled globally
     }
   };
 
-  // ✅ Copy
+  //  Copy
   const handleCopy = async () => {
     await navigator.clipboard.writeText(shortUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ✅ Reset
+  // Reset
   const handleReset = () => {
     setUrl("");
     setShortUrl("");
@@ -68,7 +72,7 @@ const HomePage = () => {
     setError("");
   };
 
-  // ✅ Logout
+  // Logout
   const handleLogout = async () => {
     const res = await AuthApi.logout();
     dispatch(logout());
@@ -233,6 +237,12 @@ const HomePage = () => {
             </motion.div>
           )}
         </AnimatePresence>
+        <LinkHistory
+          links={links}
+          page={page}
+          setPage={setPage}
+          totalPages={totalPages}
+        />
       </main>
     </div>
   );

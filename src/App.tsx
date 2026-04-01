@@ -14,6 +14,7 @@ import { logout, setCredentials } from "./app/slice/authSlice";
 import OtpPage from "./pages/OtpVerification";
 import Loading from "./components/loading/Loading";
 import NotFound from "./components/notfound/NotFound";
+import AccessLimitPage from "./components/urls/LimitExceedPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -41,6 +42,7 @@ function App() {
           <Route path='/login' element={<PublicRoute><LoginPage/></PublicRoute>}/>
           <Route path="/home" element={<ProtectedRoute><HomePage/></ProtectedRoute>}/>
           <Route path="/" element={<LandingPage/>}/>
+          <Route path='/usage-limit' element={<AccessLimitPage/>}/>
 
           <Route path="*" element={<NotFound />} />
        </Routes>
